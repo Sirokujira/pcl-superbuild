@@ -2,13 +2,16 @@
 
 #------------------------------------------------------------------------------
 install=./CMakeExternals/Install
+PACKAGENAME=pcl
+PCL_VERSION=1.9
+CONFIGURATION=Release
 if [ ! -d $install ]; then
   echo "Install directory not found.  This script should be run from the top level build directory that contains CMakeExternals/Install."
   exit 1
 fi
 
 #------------------------------------------------------------------------------
-make_pcl_framework ()
+make_framework ()
 {
   ###
   # Variable setting
@@ -26,16 +29,14 @@ make_pcl_framework ()
   flann_sim_libs=`find $install/flann-ios-simulator -name *.a`
 
   # args -> version
-  # version 1.7
-  # pcl_header_dir=$install/pcl-${device_folder}/include/pcl-1.7
-  # version 1.8
-  pcl_header_dir=$install/pcl-ios-device/include/pcl-1.8
+  # version 1.9
+  pcl_header_dir=$install/pcl-ios-device/include/pcl-${PCL_VERSION}
   boost_header_dir=$install/boost-ios-device/include
   eigen_header_dir=$install/eigen
   flann_header_dir=$install/flann-ios-device/include
   qhull_header_dir=$install/qhull-ios-device/include
 
-  pcl_framework=$install/frameworks/pcl.framework
+  pcl_framework=$install/frameworks/${PACKAGENAME}.framework
   mkdir -p $pcl_framework
   rm -rf $pcl_framework/*
 
@@ -63,14 +64,14 @@ make_pcl_framework ()
 
 
 #------------------------------------------------------------------------------
-make_pcl_framework_device ()
+make_framework_device ()
 {
   # Xcode device Wrapper
 
   ###
   # Variable setting
   ###
-  current_pcl_ios_device_framework=../iOSWrapper/build.ios/Release-iphoneos/pcl.framework
+  current_ios_device_framework=../iOSWrapper/build.ios/${CONFIGUTATION}-iphoneos/${PACKAGENAME}.framework
 
   # Step 1. Build Device and Simulator versions complete
   # common
@@ -97,14 +98,14 @@ make_pcl_framework_device ()
   # args -> version
   # common
   # version 1.8
-  pcl_header_dir=$install/pcl-ios-device/include/pcl-1.8
+  pcl_header_dir=$install/pcl-ios-device/include/pcl-${PCL_VERSION}
   boost_header_dir=$install/boost-ios-device/include
   eigen_header_dir=$install/eigen
   flann_header_dir=$install/flann-ios-device/include
   qhull_header_dir=$install/qhull-ios-device/include
   # ioswrapper_header_dir=$install/ios_device_wrapper/include
   # arm64
-  pcl_arm64_header_dir=$install/pcl-ios-device-arm64/include/pcl-1.8
+  pcl_arm64_header_dir=$install/pcl-ios-device-arm64/include/pcl-${PCL_VERSION}
   boost_arm64_header_dir=$install/boost-ios-device-arm64/include
   eigen_arm64_header_dir=$install/eigen
   flann_arm64_header_dir=$install/flann-ios-device-arm64/include
@@ -112,11 +113,11 @@ make_pcl_framework_device ()
   # ioswrapper_header_dir=$install/ios_device_wrapper/include
 
   # Step 2. Copy the framework structure (from iphoneos build) to the device folder
-  pcl_framework=$install/frameworks-device/pcl.framework
+  pcl_framework=$install/frameworks-device/${PACKAGENAME}.framework
   mkdir -p ${pcl_framework}
   rm -rf $pcl_framework/*
 
-  cp -R "${current_pcl_ios_device_framework}" "${pcl_framework}/.."
+  cp -R "${current_ios_device_framework}" "${pcl_framework}/.."
 
   # mkdir $pcl_framework/Headers
   # common
@@ -147,15 +148,15 @@ make_pcl_framework_device ()
   rm -rf $pcl_framework/pcl_*
 }
 
-make_pcl_framework_simulator ()
+make_framework_simulator ()
 {
   # Xcode simulation Wrapper
 
   ###
   # Variable setting
   ###
-  current_pcl_ios_sim_framework=../iOSWrapper/build.sim64/Release-iphonesimulator/pcl.framework
-  # current_pcl_ios_sim_i386_framework=../iOSWrapper/build.sim/Release-iphonesimulator/pcl.framework
+  current_ios_sim_framework=../iOSWrapper/build.sim64/${CONFIGUTATION}-iphonesimulator/${PACKAGENAME}.framework
+  # current_ios_sim_i386_framework=../iOSWrapper/build.sim/${CONFIGUTATION}-iphonesimulator/${PACKAGENAME}.framework
 
   pcl_sim_libs=`find $install/pcl-ios-simulator -name *.a`
   boost_sim_libs=`find $install/boost-ios-simulator -name *.a`
@@ -175,7 +176,7 @@ make_pcl_framework_simulator ()
 
   # args -> version
   # version 1.8
-  pcl_header_dir=$install/pcl-ios-simulator/include/pcl-1.8
+  pcl_header_dir=$install/pcl-ios-simulator/include/pcl-${PCL_VERSION}
   boost_header_dir=$install/boost-ios-simulator/include
   eigen_header_dir=$install/eigen
   flann_header_dir=$install/flann-ios-simulator/include
@@ -183,11 +184,11 @@ make_pcl_framework_simulator ()
   # ioswrapper_header_dir=$install/ioswrapper-ios-simulator/include
 
   # Step 3. Copy the framework structure (from iphoneos-simulator build) to the device folder
-  pcl_framework=$install/frameworks-simulator/pcl.framework
+  pcl_framework=$install/frameworks-simulator/${PACKAGENAME}.framework
   mkdir -p ${pcl_framework}
   rm -rf $pcl_framework/*
 
-  cp -R "${current_pcl_ios_sim_framework}" "${pcl_framework}/.."
+  cp -R "${current_ios_sim_framework}" "${pcl_framework}/.."
 
   # Public Header
   # mkdir $pcl_framework/Headers
@@ -208,8 +209,8 @@ make_pcl_framework_simulator ()
   # ranlib $pcl_sim_libs
 
   # combine libraries
-  # libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $pcl_sim_i386_libs $boost_sim_i386_libs $flann_sim_i386_libs $qhull_sim_i386_libs $current_pcl_ios_sim_framework/pcl $current_pcl_ios_sim_i386_framework/pcl
-  libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $current_pcl_ios_sim_framework/pcl
+  # libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $pcl_sim_i386_libs $boost_sim_i386_libs $flann_sim_i386_libs $qhull_sim_i386_libs $current_ios_sim_framework/pcl $current_ios_sim_i386_framework/pcl
+  libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $current_ios_sim_framework/pcl
 
   # combine Xcode generator frameworks and external build libraries
   lipo -create -output $pcl_framework/pcl $pcl_framework/pcl_sim
@@ -218,16 +219,16 @@ make_pcl_framework_simulator ()
   rm -rf $pcl_framework/pcl_*
 }
 
-make_pcl_framework_universal ()
+make_framework_universal ()
 {
   # Xcode device/simulation Wrapper framework path
 
   ###
   # Variable setting
   ###
-  current_pcl_ios_device_framework=../iOSWrapper/build.ios/Release-iphoneos/pcl.framework
-  current_pcl_ios_sim_framework=../iOSWrapper/build.sim64/Release-iphonesimulator/pcl.framework
-  # current_pcl_ios_sim_i386_framework=../iOSWrapper/build.sim/Release-iphonesimulator/pcl.framework
+  current_ios_device_framework=../iOSWrapper/build.ios/${CONFIGUTATION}-iphoneos/${PACKAGENAME}.framework
+  current_ios_sim_framework=../iOSWrapper/build.sim64/${CONFIGUTATION}-iphonesimulator/${PACKAGENAME}.framework
+  # current_ios_sim_i386_framework=../iOSWrapper/build.sim/${CONFIGUTATION}-iphonesimulator/${PACKAGENAME}.framework
 
   # device_folder = "ios-device"
   # simulator_folder = "ios-simulator"
@@ -275,13 +276,14 @@ make_pcl_framework_universal ()
   # pcl_header_dir=$install/pcl-${device_folder}/include/pcl-1.7
   # version 1.8
   # common
-  pcl_header_dir=$install/pcl-ios-device/include/pcl-1.8
+  # version ${PCL_VERSION}
+  pcl_header_dir=$install/pcl-ios-device/include/pcl-${PCL_VERSION}
   boost_header_dir=$install/boost-ios-device/include
   eigen_header_dir=$install/eigen
   flann_header_dir=$install/flann-ios-device/include
   qhull_header_dir=$install/qhull-ios-device/include
   # arm64
-  pcl_arm64_header_dir=$install/pcl-ios-device-arm64/include/pcl-1.8
+  pcl_arm64_header_dir=$install/pcl-ios-device-arm64/include/pcl-${PCL_VERSION}
   boost_arm64_header_dir=$install/boost-ios-device-arm64/include
   eigen_arm64_header_dir=$install/eigen
   flann_arm64_header_dir=$install/flann-ios-device-arm64/include
@@ -290,15 +292,15 @@ make_pcl_framework_universal ()
   ###
   # Create Framework Directory
   ###
-  pcl_framework=$install/frameworks-universal/pcl.framework
+  pcl_framework=$install/frameworks-universal/${PACKAGENAME}.framework
   mkdir -p ${pcl_framework}
   rm -rf $pcl_framework/*
 
   ###
   # Create Framework
   ###
-  cp -R "${current_pcl_ios_device_framework}" "${pcl_framework}/.."
-  cp -R "${current_pcl_ios_sim_framework}" "${pcl_framework}/.."
+  cp -R "${current_ios_device_framework}" "${pcl_framework}/.."
+  cp -R "${current_ios_sim_framework}" "${pcl_framework}/.."
 
   mkdir $pcl_framework/Headers
   # cp -R $pcl_header_dir/* $pcl_framework/Headers/ 2>&1
@@ -323,12 +325,12 @@ make_pcl_framework_universal ()
   # ranlib $pcl_sim_libs
 
   # combine libraries
-  # libtool -static -o $pcl_framework/pcl_device $pcl_device_libs $boost_device_libs $flann_device_libs $qhull_device_libs $current_pcl_ios_device_framework/pcl
+  # libtool -static -o $pcl_framework/pcl_device $pcl_device_libs $boost_device_libs $flann_device_libs $qhull_device_libs $current_ios_device_framework/pcl
   # device
-  libtool -static -o $pcl_framework/pcl_device $pcl_device_arm64_libs $boost_arm64_device_libs $flann_arm64_device_libs $qhull_arm64_device_libs $pcl_device_armv7_libs $boost_armv7_device_libs $flann_armv7_device_libs $qhull_armv7_device_libs $pcl_device_armv7s_libs $boost_armv7s_device_libs $flann_armv7s_device_libs $qhull_armv7s_device_libs $current_pcl_ios_device_framework/pcl
+  libtool -static -o $pcl_framework/pcl_device $pcl_device_arm64_libs $boost_arm64_device_libs $flann_arm64_device_libs $qhull_arm64_device_libs $pcl_device_armv7_libs $boost_armv7_device_libs $flann_armv7_device_libs $qhull_armv7_device_libs $pcl_device_armv7s_libs $boost_armv7s_device_libs $flann_armv7s_device_libs $qhull_armv7s_device_libs $current_ios_device_framework/pcl
   # simulator
-  # libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $pcl_sim_i386_libs $boost_sim_i386_libs $flann_sim_i386_libs $qhull_sim_i386_libs $current_pcl_ios_sim_framework/pcl $current_pcl_ios_sim_i386_framework/pcl
-  libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $current_pcl_ios_sim_framework/pcl
+  libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $pcl_sim_i386_libs $boost_sim_i386_libs $flann_sim_i386_libs $qhull_sim_i386_libs $current_ios_sim_framework/pcl
+  # libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $current_ios_sim_framework/pcl
 
   # combine Xcode generator frameworks and external build libraries
   lipo -create -output $pcl_framework/pcl $pcl_framework/pcl_device $pcl_framework/pcl_sim
@@ -337,7 +339,7 @@ make_pcl_framework_universal ()
   rm -rf $pcl_framework/pcl_*
 }
 
-make_pcl_framework_universal2 ()
+make_framework_universal2 ()
 {
   # framework tree style
 
@@ -345,9 +347,9 @@ make_pcl_framework_universal2 ()
   # Variable setting
   ###
   # Xcode device/simulation Wrapper framework path
-  current_pcl_ios_device_framework=../iOSWrapper/build.ios/Release-iphoneos/pcl.framework
-  current_pcl_ios_sim_framework=../iOSWrapper/build.sim64/Release-iphonesimulator/pcl.framework
-  # current_pcl_ios_sim_i386_framework=../iOSWrapper/build.sim/Release-iphonesimulator/pcl.framework
+  current_ios_device_framework=../iOSWrapper/build.ios/${CONFIGUTATION}-iphoneos/${PACKAGENAME}.framework
+  current_ios_sim_framework=../iOSWrapper/build.sim64/${CONFIGUTATION}-iphonesimulator/${PACKAGENAME}.framework
+  # current_ios_sim_i386_framework=../iOSWrapper/build.sim/${CONFIGUTATION}-iphonesimulator/${PACKAGENAME}.framework
   FRAMEWORK_VERSION="A"
 
   # device_folder = "ios-device"
@@ -396,20 +398,20 @@ make_pcl_framework_universal2 ()
   # pcl_header_dir=$install/pcl-${device_folder}/include/pcl-1.7
   # version 1.8
   # common
-  pcl_header_dir=$install/pcl-ios-device/include/pcl-1.8
+  pcl_header_dir=$install/pcl-ios-device/include/pcl-${PCL_VERSION}
   boost_header_dir=$install/boost-ios-device/include
   eigen_header_dir=$install/eigen
   flann_header_dir=$install/flann-ios-device/include
   qhull_header_dir=$install/qhull-ios-device/include
   # arm64
-  pcl_arm64_header_dir=$install/pcl-ios-device-arm64/include/pcl-1.8
+  pcl_arm64_header_dir=$install/pcl-ios-device-arm64/include/pcl-${PCL_VERSION}
   boost_arm64_header_dir=$install/boost-ios-device-arm64/include
   eigen_arm64_header_dir=$install/eigen
   flann_arm64_header_dir=$install/flann-ios-device-arm64/include
   qhull_arm64_header_dir=$install/qhull-ios-device-arm64/include
 
   # Create Framework Directory
-  pcl_framework=$install/frameworks-universal/pcl.framework
+  pcl_framework=$install/frameworks-universal/${PACKAGENAME}.framework
   mkdir -p ${pcl_framework}
   rm -rf $pcl_framework/*
 
@@ -423,14 +425,14 @@ make_pcl_framework_universal2 ()
   ln -s Versions/Current/${FRAMEWORK_NAME} ${pcl_framework}/pcl
 
   # Create Framework
-  # cp -R "${current_pcl_ios_device_framework}" "${pcl_framework}/.."
-  # cp -R "${current_pcl_ios_sim_framework}" "${pcl_framework}/.."
-  cp -R "${current_pcl_ios_device_framework}/*.hpp" "${pcl_framework}/Headers/"
-  cp -R "${current_pcl_ios_device_framework}/*.h" "${pcl_framework}/Headers/"
-  cp -R "${current_pcl_ios_device_framework}/*.plist" "${pcl_framework}/Resources/"
-  cp -R "${current_pcl_ios_sim_framework}/*.hpp" "${pcl_framework}/Headers/"
-  cp -R "${current_pcl_ios_sim_framework}/*.h" "${pcl_framework}/Headers/"
-  cp -R "${current_pcl_ios_sim_framework}/*.plist" "${pcl_framework}/Resources/"
+  # cp -R "${current_ios_device_framework}" "${pcl_framework}/.."
+  # cp -R "${current_ios_sim_framework}" "${pcl_framework}/.."
+  cp -R "${current_ios_device_framework}/*.hpp" "${pcl_framework}/Headers/"
+  cp -R "${current_ios_device_framework}/*.h" "${pcl_framework}/Headers/"
+  cp -R "${current_ios_device_framework}/*.plist" "${pcl_framework}/Resources/"
+  cp -R "${current_ios_sim_framework}/*.hpp" "${pcl_framework}/Headers/"
+  cp -R "${current_ios_sim_framework}/*.h" "${pcl_framework}/Headers/"
+  cp -R "${current_ios_sim_framework}/*.plist" "${pcl_framework}/Resources/"
 
   # Public Header
   mkdir $pcl_framework/Headers
@@ -457,12 +459,12 @@ make_pcl_framework_universal2 ()
   # ranlib $pcl_sim_libs
 
   # combine libraries
-  # libtool -static -o $pcl_framework/pcl_device $pcl_device_libs $boost_device_libs $flann_device_libs $qhull_device_libs $current_pcl_ios_device_framework/pcl
+  # libtool -static -o $pcl_framework/pcl_device $pcl_device_libs $boost_device_libs $flann_device_libs $qhull_device_libs $current_ios_device_framework/pcl
   # device
-  libtool -static -o $pcl_framework/pcl_device $pcl_device_arm64_libs $boost_arm64_device_libs $flann_arm64_device_libs $qhull_arm64_device_libs $pcl_device_armv7_libs $boost_armv7_device_libs $flann_armv7_device_libs $qhull_armv7_device_libs $pcl_device_armv7s_libs $boost_armv7s_device_libs $flann_armv7s_device_libs $qhull_armv7s_device_libs $current_pcl_ios_device_framework/pcl
+  libtool -static -o $pcl_framework/pcl_device $pcl_device_arm64_libs $boost_arm64_device_libs $flann_arm64_device_libs $qhull_arm64_device_libs $pcl_device_armv7_libs $boost_armv7_device_libs $flann_armv7_device_libs $qhull_armv7_device_libs $pcl_device_armv7s_libs $boost_armv7s_device_libs $flann_armv7s_device_libs $qhull_armv7s_device_libs $current_ios_device_framework/pcl
   # simulator
-  # libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $pcl_sim_i386_libs $boost_sim_i386_libs $flann_sim_i386_libs $qhull_sim_i386_libs $current_pcl_ios_sim_framework/pcl $current_pcl_ios_sim_i386_framework/pcl
-  libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $current_pcl_ios_sim_framework/pcl
+  # libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $pcl_sim_i386_libs $boost_sim_i386_libs $flann_sim_i386_libs $qhull_sim_i386_libs $current_ios_sim_framework/pcl $current_ios_sim_i386_framework/pcl
+  libtool -static -o $pcl_framework/pcl_sim $pcl_sim_libs $boost_sim_libs $flann_sim_libs $qhull_sim_libs $current_ios_sim_framework/pcl
 
   # combine Xcode generator frameworks and external build libraries
   lipo -create -output $pcl_framework/Versions/Current/pcl $pcl_framework/pcl_device $pcl_framework/pcl_sim
@@ -473,14 +475,14 @@ make_pcl_framework_universal2 ()
 
 #------------------------------------------------------------------------------
 if [ "$1" == "pcl" ]; then
-  make_pcl_framework
+  make_framework
 elif [ "$1" == "universal" ]; then
-  make_pcl_framework_universal
+  make_framework_universal
 elif [ "$1" == "device" ]; then
-  make_pcl_framework_device
+  make_framework_device
 elif [ "$1" == "simulator" ]; then
-  make_pcl_framework_simulator
+  make_framework_simulator
 else
-  echo "Usage: $0 pcl"
+  echo "Usage: $0 universal/device/simulator"
   exit 1
 fi

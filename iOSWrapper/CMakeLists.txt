@@ -69,8 +69,8 @@ if (IOS_TESTS)
 project(XCTest CXX C)
 enable_testing()
 
-find_package(XCTest REQUIRED)
 include(FindXCTest)
+find_package(XCTest REQUIRED)
 
 message(STATUS XCTestFound:${XCTest_FOUND})
 message(STATUS XCTest_EXECUTABLE:${XCTest_EXECUTABLE})

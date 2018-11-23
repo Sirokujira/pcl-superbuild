@@ -1,0 +1,50 @@
+resources:
+  containers:
+    - container: env1604
+      image: pointcloudlibrary/env:16.04
+
+jobs:
+  - job: ubuntu1604
+    displayName: Ubuntu 16.04 Build
+    timeoutInMinutes: 0
+    pool:
+      vmImage: 'Ubuntu 16.04'
+    container: env1604
+    variables:
+      ANDROID_NDK: "C:/projects/android-ndk-r16b"
+      ANDROID_ABIs: "x86_64"
+	  TOOLCHAIN_NAME: "x86_64-linux-android-clang3.6"
+      ANDROID_TARGET_API: "26"
+      BUILD_DIR: '$(Agent.BuildDirectory)/build'
+      CMAKE_CXX_FLAGS: '-Wall -Wextra -Wabi -O2'
+    steps:
+      - script: |
+          wget -qO- http://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip -O /tmp/android-ndk-r16b-linux-x86_64.zip
+          unzip -q /tmp/android-ndk-r16b-linux-x86_64.zip
+          cd android-ndk-r16b
+          export ANDROID_NDK=$PWD
+          cd ..
+
+          # sudo dd if=/dev/zero of=/swapfile bs=1024 count=4194304
+          # sudo mkswap /swapfile
+          # sudo swapon /swapfile
+
+          mkdir $BUILD_DIR && cd $BUILD_DIR
+          cmake $(Build.SourcesDirectory) \
+            -G"Ninja" \
+            -DBUILD_ANDROID:BOOL="ON" \
+            -DBUILD_IOS_DEVICE:BOOL="OFF" \
+            -DBUILD_IOS_SIMULATOR:BOOL="OFF" \
+            -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${ANDROID_NDK}/build/cmake/android.toolchain.cmake  \
+            -DCMAKE_MAKE_PROGRAM=${ANDROID_NDK}/prebuilt/linux-x86_64/bin/make  \
+            -DANDROID_TOOLCHAIN_NAME=${TOOLCHAIN_NAME} \
+            -DANDROID_NATIVE_API_LEVEL=${ANDROID_TARGET_API} \
+            -DANDROID_ABI=${ANDROID_ABIs} \
+            -DANDROID_TOOLCHAIN=${TARGET_COMPILER}
+            -DCMAKE_CXX_FLAGS="$CMAKE_CXX_FLAGS" \
+            -DPCL_ONLY_CORE_POINT_TYPES=ON \
+        displayName: 'CMake Configuration'
+      - script: |
+          cd $BUILD_DIR
+          cmake --build . --config Release
+        displayName: 'Build Library'

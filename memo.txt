@@ -130,7 +130,7 @@ https://docs.microsoft.com/en-us/xamarin/ios/platform/binding-objective-c/walkth
 
 ---
 
-ARCore が対応している項目について
+ARCore(?.?) が対応している項目について
 ・モーショントラッキング
 ・水平・垂直面の検出(認識)
 ・光源の推測(環境光)
@@ -138,7 +138,25 @@ ARCore が対応している項目について
 ・空間共有
 ・マーカー画像検知
 
+ARKit が対応している項目について
+
 ---
 
 http://pointclouds.org/documentation/tutorials/normal_estimation_using_integral_images.php#normal-estimation-using-integral-images
 
+---
+
+Docker 作成 - Mac 上での対応。
+・全環境(Android/iOS/Xamarin)のビルドができるようにする。
+
+---
+
+setup-superbuild.cmake
+
+環境変数の設定
+・source/build/install のフォルダ先設定
+
+/usr/local/share/cmake-3.9/Modules/FindPackageHandleStandardArgs.cmake:137 (message)
+Error 
+EIGEN_INCLUDE_DIR に参照先をを設定していないと 標準が持っている cmake からエラーが発生する。
+※ CMake 側は EIGEN_INCLUDE_DIRS になっているが

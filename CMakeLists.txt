@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
 
 # reference pcl cmakelists.txt cmake policy
 # start
@@ -12,6 +12,11 @@ if(POLICY CMP0020 AND (WIN32 AND NOT MINGW))
   cmake_policy(SET CMP0020 NEW) # Automatically link Qt executables to qtmain target on Windows
 endif()
 
+if(POLICY CMP0042)
+  # Uses Mac OS X @rpath in the target's install name
+  cmake_policy(SET CMP0042 NEW)
+endif()
+
 if(POLICY CMP0048)
   cmake_policy(SET CMP0048 OLD) # do not use VERSION option in project() command
 endif()
@@ -19,10 +24,21 @@ endif()
 if(POLICY CMP0054)
   cmake_policy(SET CMP0054 OLD) # Silent warnings about quoted variables
 endif()
+
+if(POLICY CMP0074)
+  # TODO:
+  # 1. Find*.cmake modules need to be individually verified.
+  # 2. PCLConfig.cmake needs to be changed.
+  cmake_policy(SET CMP0074 OLD)
+endif()
 # end
 
 # use elseif
 cmake_policy(GET CMP0054 NEW)
+
+# http://cmake.3232098.n2.nabble.com/Computation-of-CMAKE-OSX-SYSROOT-td7598354.html
+# set use xcode target version
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.14")
 
 project(superbuild NONE)
 
@@ -41,8 +57,8 @@ fetch_boost()
 fetch_flann()
 fetch_qhull()
 
-# Build overTime
-# pcl-vtk not Implement ios/android I/F
+# Build overTime and
+# pcl-vtk not Implement ios/android vtk I/F
 # compile_vtk()
 
 set(tags)
@@ -77,7 +93,7 @@ if (BUILD_IOS_SIMULATOR_I386)
 endif()
 
 foreach(tag ${tags})
-  # Build overTime
+  # Build overTime and pcl_visualization not support android/ios IF
   # crosscompile_vtk(${tag})
   crosscompile_boost(${tag})
   # crosscompile_boost_on_b2(${tag})

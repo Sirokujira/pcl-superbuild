@@ -157,7 +157,10 @@ macro(fetch_boost)
     GIT_TAG origin/master
     # official(not cmake file)
     # GIT_REPOSITORY git://github.com/boostorg/boost.git
+    # 1.8.1?
     # GIT_TAG boost-1.64.0
+    # 1.9.0
+    # GIT_TAG boost-1.68.0
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND ""
@@ -168,9 +171,9 @@ endmacro()
 # Boost crosscompile
 #
 macro(crosscompile_boost tag)
-
   set(proj boost-${tag})
   get_toolchain_file(${tag})
+
   ExternalProject_Add(
     ${proj}
     SOURCE_DIR ${source_prefix}/boost
@@ -202,7 +205,6 @@ endmacro()
 # Boost crosscompile(use b2.exe)
 #
 macro(crosscompile_boost_on_b2 tag)
-
   set(proj boost-${tag})
 
   if (${tag} eq "android")
@@ -241,7 +243,9 @@ macro(fetch_pcl)
     pcl-fetch
     SOURCE_DIR ${source_prefix}/pcl
     GIT_REPOSITORY git://github.com/PointCloudLibrary/pcl.git
-    GIT_TAG pcl-1.8.1
+    GIT_TAG pcl-1.9.0
+    # BUild NG : (Boost)
+    # GIT_TAG pcl-1.9.0
     # Test
     # GIT_REPOSITORY git://github.com/Sirokujira/pcl.git
     # GIT_TAG Branch_pcl-1.8.1
@@ -258,7 +262,7 @@ endmacro()
 #
 # PCL crosscompile
 # 
-# use official
+# reference windows base settings.
 # https://gist.github.com/UnaNancyOwen/59319050d53c137ca8f3#file-pcl1-8-1-md
 macro(crosscompile_pcl tag)
   set(proj pcl-${tag})
@@ -347,11 +351,23 @@ macro(crosscompile_pcl tag)
       -DBUILD_surface:BOOL=ON
       -DBUILD_visualization:BOOL=OFF
       -DBUILD_examples:BOOL=OFF
+      # use pcl cmake paths
       -DEIGEN_INCLUDE_DIR:PATH=${install_prefix}/eigen
+      -DFLANN_ROOT:PATH=${install_prefix}/flann-${tag}
+      # use pcl cmake paths
       -DFLANN_INCLUDE_DIR:PATH=${install_prefix}/flann-${tag}/include
       -DFLANN_LIBRARY:FILEPATH=${install_prefix}/flann-${tag}/lib/libflann_cpp_s.a
       -DFLANN_LIBRARY_DEBUG:FILEPATH=${install_prefix}/flann-${tag}/lib/libflann_cpp_s-gd.lib
-      -DBOOST_ROOT=${install_prefix}/boost-${tag}
+      -DQHULL_ROOT:PATH=${install_prefix}/qhull-${tag}
+      -DQHULL_INCLUDE_DIR:PATH=${install_prefix}/qhull-${tag}/include
+      # -DQHULL_INCLUDE_DIRS:PATH=${install_prefix}/qhull-${tag}/include
+      # libqhullcpp.a libqhullstatic.a libqhullstatic_r.a
+      # 1.9.0?
+      # -DBOOSTROOT:PATH=${install_prefix}/boost-${tag}
+      # 1.8.1
+      -DBOOST_ROOT:PATH=${install_prefix}/boost-${tag}
+      -DBOOST_INCLUDEDIR:PATH=${install_prefix}/boost-${tag}/include
+      -DBOOST_LIBRARYDIR:PATH=${install_prefix}/boost-${tag}/lib
       -DBoost_INCLUDE_DIR:PATH=${install_prefix}/boost-${tag}/include
       -DBoost_LIBRARY_DIRS:PATH=${install_prefix}/boost-${tag}/lib
       # http://pointclouds.org/documentation/tutorials/building_pcl.php
@@ -370,6 +386,7 @@ macro(crosscompile_pcl tag)
       -DBoost_IOSTREAMS_LIBRARY:FILEPATH=${install_prefix}/boost-${tag}/lib/libboost_iostreams.a
       -DBoost_IOSTREAMS_LIBRARY_DEBUG:FILEPATH=${install_prefix}/boost-${tag}/lib/libboost_iostreams-gd.a
       -DBoost_IOSTREAMS_LIBRARY_RELEASE:FILEPATH=${install_prefix}/boost-${tag}/lib/libboost_iostreams.a
+      # must not delete
       -C ${try_run_results_file}
   )
 
