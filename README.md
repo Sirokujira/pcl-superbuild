@@ -7,8 +7,8 @@
 > AppVeyor/Travis/CircleCI → GitHub Actions, plus SwiftPM / CocoaPods / Maven
 > distribution.
 >
-> The last commit here (`83cc231`, 2018-11-23) is tagged in the successor
-> repository as `pcl-superbuild-origin`, and this history is grafted onto its
+> The last development commit here (`83cc231`, 2018-11-23) is tagged in the
+> successor repository as `pcl-superbuild-origin`, and this history is grafted onto its
 > own, so `git log` there walks straight back through these commits. See
 > [docs/LINEAGE.md](https://github.com/Sirokujira/pcl_mobile_framework/blob/master/docs/LINEAGE.md)
 > for the file-by-file derivation map.
