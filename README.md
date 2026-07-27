@@ -1,15 +1,19 @@
 > ### ℹ️ Active development moved to pcl_mobile_framework
 >
-> This repository's last commit is from November 2018. Work continues in
+> Development here stopped in November 2018. Work continues in
 > **[Sirokujira/pcl_mobile_framework](https://github.com/Sirokujira/pcl_mobile_framework)**,
-> which took over this project's build system in June 2019 and modernized it:
+> which carried this project's build system forward from June 2019 and
+> modernized it:
 > PCL 1.9 → 1.14, NDK r16b → r26+, `lipo` fat frameworks → XCFramework,
 > AppVeyor/Travis/CircleCI → GitHub Actions, plus SwiftPM / CocoaPods / Maven
 > distribution.
 >
 > The last development commit here (`83cc231`, 2018-11-23) is tagged in the
-> successor repository as `pcl-superbuild-origin`, and this history is grafted onto its
-> own, so `git log` there walks straight back through these commits. See
+> successor repository as `pcl-superbuild-origin`, and this history is grafted
+> onto its own, so `git log` there walks straight back through these commits.
+> Note that the successor's first commit is a partial snapshot of a working
+> tree, not a checkout of `83cc231` — 44 files of this repository were left
+> behind, including the whole `iOSWrapper/` source set. See
 > [docs/LINEAGE.md](https://github.com/Sirokujira/pcl_mobile_framework/blob/master/docs/LINEAGE.md)
 > for the file-by-file derivation map.
 >
